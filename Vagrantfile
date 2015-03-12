@@ -20,25 +20,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
-  config.vm.network "forwarded_port", guest: 80, host: 8088
+  config.vm.network "forwarded_port", guest: 80, host: 8089
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   config.vm.network "private_network", ip: "192.168.33.11"
 
-  config.vm.provision "file", source: "test.aspx", destination: "/var/www/html/test.aspx"
-  config.vm.provision "shell", inline: <<-EOT        
+  config.vm.provision "shell", inline: <<-EOT
     sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
     echo "deb http://download.mono-project.com/repo/debian wheezy main" | sudo tee /etc/apt/sources.list.d/mono-xamarin.list
     echo "deb http://download.mono-project.com/repo/debian wheezy-apache24-compat main" | sudo tee -a /etc/apt/sources.list.d/mono-xamarin.list
-    sudo apt-get update
+    sudo apt-get -y update
     # for mono
-    sudo apt-get install mono-devel mono-complete referenceassemblies-pcl
+    sudo apt-get install -y mono-devel mono-complete referenceassemblies-pcl
     # for web server
-    sudo apt-get install libapache2-mod-mono
+    sudo apt-get install -y libapache2-mod-mono
+    sudo a2enmod mod_mono_auto
+    sudo service apache2 restart
 
     sudo cp /vagrant/test.aspx /var/www/html/
-  EOT                                                
+  EOT
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
